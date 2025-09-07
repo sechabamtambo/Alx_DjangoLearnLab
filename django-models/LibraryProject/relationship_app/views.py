@@ -1,16 +1,10 @@
-from django.shortcuts import render
-from django.shortcuts import redirect
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.views.generic.detail import DetailView
-from .models import Book
-from .models import Library
-
-# Explicit imports for authentication
-from django.contrib.auth import login
-from django.contrib.auth import logout
-from django.contrib.auth import authenticate
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.decorators import user_passes_test
+from .models import Book, Library, UserProfile
 
 # Function-based view to list all books
 def list_books(request):
@@ -55,3 +49,17 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return render(request, 'relationship_app/logout.html')
+
+# Role-based access views
+
+@user_passes_test(lambda u: hasattr(u, 'userprofile') and u.userprofile.role == 'Admin')
+def admin_view(request):
+    return render(request, 'relationship_app/admin_view.html')
+
+@user_passes_test(lambda u: hasattr(u, 'userprofile') and u.userprofile.role == 'Librarian')
+def librarian_view(request):
+    return render(request, 'relationship_app/librarian_view.html')
+
+@user_passes_test(lambda u: hasattr(u, 'userprofile') and u.userprofile.role == 'Member')
+def member_view(request):
+    return render(request, 'relationship_app/member_view.html')
