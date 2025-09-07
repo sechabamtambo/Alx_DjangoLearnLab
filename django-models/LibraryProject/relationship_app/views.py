@@ -1,12 +1,12 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.views.generic.detail import DetailView
-from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth import login, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import user_passes_test
 from .models import Book, Library, UserProfile
 
-# Function-based view to list all books
+# Book views
 def list_books(request):
     books = Book.objects.all()
     try:
@@ -15,13 +15,12 @@ def list_books(request):
         book_list = "\n".join([f"{book.title} by {book.author.name}" for book in books])
         return HttpResponse(f"<pre>{book_list}</pre>")
 
-# Class-based view to show library details
 class LibraryDetailView(DetailView):
     model = Library
     template_name = 'relationship_app/library_detail.html'
     context_object_name = 'library'
 
-# User registration view
+# Authentication views
 def register_view(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
@@ -33,7 +32,6 @@ def register_view(request):
         form = UserCreationForm()
     return render(request, 'relationship_app/register.html', {'form': form})
 
-# User login view
 def login_view(request):
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)
@@ -45,13 +43,11 @@ def login_view(request):
         form = AuthenticationForm()
     return render(request, 'relationship_app/login.html', {'form': form})
 
-# User logout view
 def logout_view(request):
     logout(request)
     return render(request, 'relationship_app/logout.html')
 
 # Role-based access views
-
 @user_passes_test(lambda u: hasattr(u, 'userprofile') and u.userprofile.role == 'Admin')
 def admin_view(request):
     return render(request, 'relationship_app/admin_view.html')
