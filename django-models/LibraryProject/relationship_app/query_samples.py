@@ -1,22 +1,16 @@
-import os
-import sys
-import django
+from .models import Author, Book, Library
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'LibraryProject.settings')
-django.setup()
 
-from relationship_app.models import Author, Book, Library, Librarian
+def query_books_by_author(author_name):
+    author = Author.objects.get(name=author_name)
+    return author.books.all()
 
-author_name = "J.K. Rowling"
-author = Author.objects.get(name=author_name)
-books_by_author = Book.objects.filter(author=author) 
-print(f"Books by {author_name}:", [book.title for book in books_by_author])
 
-library_name = "Central Library"
-library = Library.objects.get(name=library_name) 
-books_in_library = library.books.all()
-print(f"Books in {library_name}:", [book.title for book in books_in_library])
+def list_books_in_library(library_name):
+    library = Library.objects.get(name=library_name)
+    return library.books.all()
 
-librarian = Librarian.objects.get(library=library)
-print(f"Librarian of {library_name}:", librarian.name)
+
+def get_librarian_for_library(library_name):
+    library = Library.objects.get(name=library_name)
+    return library.librarian
