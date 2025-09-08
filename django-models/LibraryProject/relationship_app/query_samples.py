@@ -3,8 +3,7 @@ from .models import Author, Book, Library, Librarian
 # Query all books by a specific author
 def get_books_by_author(author_name):
     author = Author.objects.get(name=author_name)
-    books = Book.objects.filter(author=author)  # required by checker
-    return books
+    return Book.objects.filter(author=author)
 
 # List all books in a library
 def get_books_in_library(library_name):
@@ -14,5 +13,4 @@ def get_books_in_library(library_name):
 # Retrieve the librarian for a library
 def get_librarian_for_library(library_name):
     library = Library.objects.get(name=library_name)
-    librarian = Librarian.objects.get(library=library)  # required by checker
-    return librarian
+    return Librarian.objects.get(library=library)
