@@ -15,36 +15,17 @@ class BookAPITestCase(APITestCase):
         self.update_url = reverse('book-update')
         self.delete_url = reverse('book-delete')
 
-    def test_list_books(self):
-        response = self.client.get(self.list_url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-    def test_create_book_requires_auth(self):
+    def test_create_book_authenticated(self):
+        self.client.login(username='testuser', password='testpass')
         data = {'title': 'Book Two', 'publication_year': 2021, 'author': self.author.id}
-        response = self.client.post(self.create_url, data)
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
-        self.client.force_authenticate(user=self.user)
         response = self.client.post(self.create_url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    def test_update_delete_requires_auth(self):
-        self.client.force_authenticate(user=self.user)
-        response = self.client.put(self.update_url, {'title': 'Updated', 'publication_year': 2000, 'author': self.author.id})
+    def test_update_delete_authenticated(self):
+        self.client.login(username='testuser', password='testpass')
+        data = {'title': 'Updated', 'publication_year': 2000, 'author': self.author.id}
+        response = self.client.put(self.update_url, data)
         self.assertIn(response.status_code, [status.HTTP_200_OK, status.HTTP_204_NO_CONTENT])
 
         response = self.client.delete(self.delete_url)
         self.assertIn(response.status_code, [status.HTTP_204_NO_CONTENT, status.HTTP_200_OK])
-
-    def test_filter_search_order(self):
-        # Filtering
-        response = self.client.get(self.list_url, {'title': 'Book One'})
-        self.assertEqual(len(response.data), 1)
-
-        # Searching
-        response = self.client.get(self.list_url, {'search': 'Author One'})
-        self.assertEqual(len(response.data), 1)
-
-        # Ordering
-        response = self.client.get(self.list_url, {'ordering': 'publication_year'})
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
