@@ -19,6 +19,6 @@ urlpatterns = [
 
     # Comments
     path("post/<int:pk>/comments/new/", views.CommentCreateView.as_view(), name="comment_new"),
-    path("comments/<int:pk>/update/", views.CommentUpdateView.as_view(), name="comment_update"),
-    path("comments/<int:pk>/delete/", views.CommentDeleteView.as_view(), name="comment_delete"),
+    path("comment/<int:pk>/update/", views.CommentUpdateView.as_view(), name="comment_update"),
+    path("comment/<int:pk>/delete/", views.CommentDeleteView.as_view(), name="comment_delete"),
 ]
