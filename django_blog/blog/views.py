@@ -5,13 +5,14 @@ from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
+from django.db.models import Q
 from .models import Post, Comment
 from .forms import UserRegisterForm, PostForm, CommentForm
 
 # ----------------------------
-# Authentication views
+# Authentication Views
 # ----------------------------
-def register_view(request):
+def register(request):
     if request.method == "POST":
         form = UserRegisterForm(request.POST)
         if form.is_valid():
@@ -40,17 +41,15 @@ def logout_view(request):
     return redirect("login")
 
 @login_required
-def profile_view(request):
+def profile(request):
     if request.method == "POST":
-        email = request.POST.get("email")
-        request.user.email = email
+        request.user.email = request.POST.get("email")
         request.user.save()
         messages.success(request, "Profile updated")
     return render(request, "blog/profile.html")
 
-
 # ----------------------------
-# Blog CRUD views
+# Blog CRUD Views
 # ----------------------------
 class PostListView(ListView):
     model = Post
@@ -89,9 +88,8 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         post = self.get_object()
         return self.request.user == post.author
 
-
 # ----------------------------
-# Comment views
+# Comment Views
 # ----------------------------
 class CommentCreateView(LoginRequiredMixin, CreateView):
     model = Comment
@@ -101,8 +99,7 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.author = self.request.user
         form.instance.post = get_object_or_404(Post, pk=self.kwargs["pk"])
-
-
+        return super().form_valid(form)
 
 class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Comment
@@ -120,3 +117,17 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         comment = self.get_object()
         return self.request.user == comment.author
+
+# ----------------------------
+# Search View
+# ----------------------------
+def search_posts(request):
+    query = request.GET.get("q", "")
+    results = []
+    if query:
+        results = Post.objects.filter(
+            Q(title__icontains=query) |
+            Q(content__icontains=query) |
+            Q(tags__name__icontains=query)
+        ).distinct()
+    return render(request, "blog/search_results.html", {"query": query, "results": results})
