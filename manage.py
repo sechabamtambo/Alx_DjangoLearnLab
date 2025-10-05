@@ -6,6 +6,7 @@ import sys
 
 def main():
     """Run administrative tasks."""
+<<<<<<< Updated upstream
 <<<<<<< HEAD
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_blog.settings')
 =======
@@ -15,6 +16,9 @@ def main():
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'LibraryProject.settings')
 >>>>>>> a3173103943b284f658dae12fad8338bc927ec82
 >>>>>>> 3d355f2878a7b71a245317b672e1f7ce0b5f42d5
+=======
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'advanced_api_project.settings')
+>>>>>>> Stashed changes
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
